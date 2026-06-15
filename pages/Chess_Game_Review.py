@@ -26,56 +26,28 @@ import chess.engine
 import chess.svg
 from io import StringIO
 import os
-import urllib.request
-import zipfile
-import glob
 
-# ================================================================================================================================
-# STOCKFISH AUTO SETUP 
-# ===============================================================================================================================================
+# ====================================================================
+# STOCKFISH SETUP
+# ====================================================================
 
-ENGINE_DIR = "engine"
-os.makedirs(ENGINE_DIR, exist_ok=True)
-
-ZIP_FILE = os.path.join(ENGINE_DIR, "stockfish.zip")
-
-URL = (
-    "https://stockfishchess.org/files/"
-    "stockfish_16_linux_x64_avx2.zip"
-)
-
-if not os.path.exists(ZIP_FILE):
-    urllib.request.urlretrieve(URL, ZIP_FILE)
-
-# Extract if executable not already found
-if not glob.glob(f"{ENGINE_DIR}/**/*stockfish*", recursive=True):
-    with zipfile.ZipFile(ZIP_FILE) as z:
-        z.extractall(ENGINE_DIR)
-
-possible = glob.glob(
-    f"{ENGINE_DIR}/**/*stockfish*",
-    recursive=True
-)
-
-STOCKFISH_PATH = None
-
-for f in possible:
-    if os.path.isfile(f) and ".zip" not in f:
-        try:
-            os.chmod(f, 0o755)
-        except:
-            pass
-        STOCKFISH_PATH = f
-        break
+# LOCAL PATH TO STOCKFISH
+STOCKFISH_PATH = "engine/stockfish/stockfish"
 
 st.set_page_config(
     page_title="Chess Review",
     layout="wide"
 )
 
-if STOCKFISH_PATH is None:
-    st.error("Stockfish engine not found.")
+if not os.path.exists(STOCKFISH_PATH):
+    st.error(f"Stockfish not found:\n{STOCKFISH_PATH}")
     st.stop()
+
+try:
+    os.chmod(STOCKFISH_PATH, 0o755)
+except:
+    pass
+
 
 @st.cache_resource
 def load_engine():
@@ -83,7 +55,13 @@ def load_engine():
         STOCKFISH_PATH
     )
 
-engine = load_engine()
+
+try:
+    engine = load_engine()
+
+except Exception as e:
+    st.error(f"Engine failed to load:\n{e}")
+    st.stop()
 
 # =================================================================================================
 # ANALYSIS DATA
@@ -135,21 +113,21 @@ def classify(cpl):
         return "🟢 BEST", "Perfect engine move."
 
     if cpl <= 20:
-        return "💎 EXCELLENT", "Nearly perfect continuation."
+        return "💎 !! EXCELLENT !!", "Nearly perfect continuation."
 
     if cpl <= 50:
-        return "🔵 GREAT", "Strong move improving the position."
+        return "🔵 ! GREAT !", "Strong move improving the position."
 
     if cpl <= 100:
         return "⚪ GOOD", "Solid move."
 
     if cpl <= 200:
-        return "🟡 INACCURACY", "Small evaluation loss."
+        return "🟡 ?! INACCURACY ?!", "Small evaluation loss."
 
     if cpl <= 400:
-        return "🟠 MISTAKE", "Noticeable strategic loss."
+        return "🟠 ? MISTAKE ?", "Noticeable strategic loss."
 
-    return "🔴 BLUNDER", "Major loss of evaluation."
+    return "🔴 ?? BLUNDER ??", "Major loss of evaluation."
 
 # =====================================================================================================
 # EXPLANATIONS

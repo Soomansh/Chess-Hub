@@ -1,5 +1,6 @@
-#AI ASSISTANCE WAS USED IN WRITING THIS CODE-------------------------------------------------------------------------
- 
+
+# AI ASSISTANCE WAS USED IN WRITING THIS CODE-------------------------------------------------------------------------
+
 """
 Chess Review
 
@@ -16,7 +17,6 @@ Features:
 - Timeline
 - Chessboard Rendering
 - Custom Styling
-
 """
 
 import streamlit as st
@@ -25,46 +25,63 @@ import chess.pgn
 import chess.engine
 import chess.svg
 from io import StringIO
-import math
 import os
+import urllib.request
+import zipfile
+import glob
 
-# ==============================================================================================
-# CONFIG
-# ===================================================================================================
+# ================================================================================================================================
+# STOCKFISH AUTO SETUP 
+# ===============================================================================================================================================
 
-STOCKFISH_PATH = "stockfish/stockfish"
+ENGINE_DIR = "engine"
+os.makedirs(ENGINE_DIR, exist_ok=True)
 
-import os
-os.chmod(STOCKFISH_PATH, 0o755)
+ZIP_FILE = os.path.join(ENGINE_DIR, "stockfish.zip")
+
+URL = (
+    "https://stockfishchess.org/files/"
+    "stockfish_16_linux_x64_avx2.zip"
+)
+
+if not os.path.exists(ZIP_FILE):
+    urllib.request.urlretrieve(URL, ZIP_FILE)
+
+# Extract if executable not already found
+if not glob.glob(f"{ENGINE_DIR}/**/*stockfish*", recursive=True):
+    with zipfile.ZipFile(ZIP_FILE) as z:
+        z.extractall(ENGINE_DIR)
+
+possible = glob.glob(
+    f"{ENGINE_DIR}/**/*stockfish*",
+    recursive=True
+)
+
+STOCKFISH_PATH = None
+
+for f in possible:
+    if os.path.isfile(f) and ".zip" not in f:
+        try:
+            os.chmod(f, 0o755)
+        except:
+            pass
+        STOCKFISH_PATH = f
+        break
 
 st.set_page_config(
     page_title="Chess Review",
     layout="wide"
 )
 
-# =================================================================================================================
-# CSS
-# ===========================================================================================================
-
-st.markdown("""
-<style>
-.big-tag{
-    font-size:40px;
-    font-weight:bold;
-}
-.explain{
-    font-size:18px;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ==========================================================================================================
-# ENGINE
-# ========================================================================================================
+if STOCKFISH_PATH is None:
+    st.error("Stockfish engine not found.")
+    st.stop()
 
 @st.cache_resource
 def load_engine():
-    return chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
+    return chess.engine.SimpleEngine.popen_uci(
+        STOCKFISH_PATH
+    )
 
 engine = load_engine()
 

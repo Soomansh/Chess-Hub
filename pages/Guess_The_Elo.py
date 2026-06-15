@@ -9,8 +9,7 @@ st.set_page_config(page_title="Guess The Elo", layout="wide")
 # =========================================================
 # PATH TO YOUR HUGE LICHESS PGN
 # =========================================================
-PGN_PATH = r"C:\chess_data\lichess.pgn"
-
+PGN_PATH = "data/games.pgn"
 
 # =========================================================
 # STREAM RANDOM GAME (NO FULL LOAD)

@@ -26,42 +26,42 @@ import chess.engine
 import chess.svg
 from io import StringIO
 import os
+import stat
+import urllib.request
 
 # ====================================================================
 # STOCKFISH SETUP
 # ====================================================================
 
-from engine.stockfish_loader import ensure_stockfish
-STOCKFISH_PATH = ensure_stockfish()
+STOCKFISH_DIR = "engine/stockfish"
+STOCKFISH_PATH = os.path.join(STOCKFISH_DIR, "stockfish")
 
-st.set_page_config(
-    page_title="Chess Review",
-    layout="wide"
-)
+# more stable direct release 
+STOCKFISH_URL = "https://github.com/official-stockfish/Stockfish/releases/download/sf_16/stockfish-ubuntu-x86-64-avx2"
 
-if not os.path.exists(STOCKFISH_PATH):
-    st.error(f"Stockfish not found:\n{STOCKFISH_PATH}")
-    st.stop()
+def ensure_stockfish():
+    os.makedirs(STOCKFISH_DIR, exist_ok=True)
 
-try:
-    os.chmod(STOCKFISH_PATH, 0o755)
-except:
-    pass
+    if not os.path.exists(STOCKFISH_PATH):
+        print("Downloading Stockfish...")
 
+        try:
+            req = urllib.request.Request(
+                STOCKFISH_URL,
+                headers={"User-Agent": "Mozilla/5.0"}
+            )
 
-@st.cache_resource
-def load_engine():
-    return chess.engine.SimpleEngine.popen_uci(
-        STOCKFISH_PATH
-    )
+            with urllib.request.urlopen(req) as response, open(STOCKFISH_PATH, "wb") as out_file:
+                out_file.write(response.read())
 
+            os.chmod(STOCKFISH_PATH, 0o755)
 
-try:
-    engine = load_engine()
+            print("Stockfish downloaded successfully!")
 
-except Exception as e:
-    st.error(f"Engine failed to load:\n{e}")
-    st.stop()
+        except Exception as e:
+            raise RuntimeError(f"Stockfish download failed: {e}")
+
+    return STOCKFISH_PATH
 
 # =================================================================================================
 # ANALYSIS DATA

@@ -31,8 +31,8 @@ import os
 # STOCKFISH SETUP
 # ====================================================================
 
-# LOCAL PATH TO STOCKFISH
-STOCKFISH_PATH = "engine/stockfish/stockfish"
+from engine.stockfish_loader import ensure_stockfish
+STOCKFISH_PATH = ensure_stockfish()
 
 st.set_page_config(
     page_title="Chess Review",

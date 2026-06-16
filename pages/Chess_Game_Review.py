@@ -1,61 +1,45 @@
 # AI ASSISTANCE WAS USED IN WRITING THIS CODE-------------------------------------------------------------------------
 
-import os
 import streamlit as st
 import chess
 import chess.pgn
-import chess.engine
 import chess.svg
+import requests
 from io import StringIO
 
 # =========================
-# STOCKFISH (SAFE VERSION)
+# LICHESS CLOUD ENGINE API
 # =========================
 
-STOCKFISH_PATH = "stockfish"  # must exist in system or repo
+LICHESS_API = "https://lichess.org/api/cloud-eval"
 
 
-@st.cache_resource
-def load_engine():
+def analyze_position(fen):
+    """
+    Cloud-based chess analysis (NO STOCKFISH NEEDED)
+    """
     try:
-        return chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
-    except:
-        st.error("Stockfish not found. Add binary to project or install it.")
-        st.stop()
+        r = requests.get(LICHESS_API, params={"fen": fen}, timeout=5)
+        data = r.json()
 
+        cp = 0
+        pv = []
+        best_move = None
 
-engine = load_engine()
+        if "pvs" in data and len(data["pvs"]) > 0:
+            line = data["pvs"][0]
 
-# =========================
-# ANALYSIS FUNCTION (MISSING BEFORE)
-# =========================
+            cp = line.get("cp", 0)
 
-def analyze_position(engine, fen, depth=12):
-    board = chess.Board(fen)
+            if "moves" in line:
+                moves = line["moves"].split()
+                pv = moves[:5]
+                best_move = moves[0] if moves else None
 
-    try:
-        info = engine.analyse(board, chess.engine.Limit(depth=depth))
+        return cp, pv, best_move
+
     except:
         return 0, [], None
-
-    score = info["score"].relative.score(mate_score=10000)
-    if score is None:
-        score = 0
-
-    pv = []
-    best_move = None
-
-    if "pv" in info and info["pv"]:
-        temp = board.copy()
-        for mv in info["pv"][:5]:
-            try:
-                pv.append(temp.san(mv))
-                temp.push(mv)
-            except:
-                break
-        best_move = info["pv"][0]
-
-    return score, pv, best_move
 
 
 # =========================
@@ -91,7 +75,7 @@ def long_explanation(tag):
 
 
 # =========================
-# PGN LOADER (FIXED IMPORT ISSUE)
+# PGN LOADER
 # =========================
 
 def read_game(text):
@@ -103,26 +87,26 @@ def read_game(text):
 # =========================
 
 def build_review(game):
-    temp = game.board()
+    board = game.board()
     review = []
 
     white_loss = 0
     black_loss = 0
 
-    for i, move in enumerate(game.mainline_moves()):
+    for move in game.mainline_moves():
 
-        before_score, pv, best_move = analyze_position(engine, temp.fen())
+        before_score, pv, best_move = analyze_position(board.fen())
 
-        san = temp.san(move)
-        temp.push(move)
+        san = board.san(move)
+        board.push(move)
 
-        after_score, _, _ = analyze_position(engine, temp.fen())
+        after_score, _, _ = analyze_position(board.fen())
 
         cpl = abs(after_score - before_score)
 
         tag, reason = classify(cpl)
 
-        if temp.turn == chess.BLACK:
+        if board.turn == chess.BLACK:
             white_loss += cpl
         else:
             black_loss += cpl
@@ -133,7 +117,7 @@ def build_review(game):
             "cpl": cpl,
             "reason": reason,
             "long_reason": long_explanation(tag),
-            "fen": temp.fen(),
+            "fen": board.fen(),
             "pv": pv
         })
 
@@ -151,7 +135,7 @@ def accuracy(loss, count):
 
 
 # =========================
-# STREAMLIT STATE
+# STATE
 # =========================
 
 if "review" not in st.session_state:
@@ -171,7 +155,7 @@ if "black_acc" not in st.session_state:
 # UI
 # =========================
 
-st.title("♟️ Chess Review")
+st.title("♟️ Chess Review (Cloud Engine Version)")
 
 uploaded = st.file_uploader("Upload PGN", type=["pgn"])
 pgn_text = st.text_area("Or Paste PGN")
@@ -222,11 +206,15 @@ if review:
 
         board = chess.Board() if idx == 0 else chess.Board(review[idx - 1]["fen"])
 
-        _, _, best_move = analyze_position(engine, board.fen())
+        _, _, best_move = analyze_position(board.fen())
 
         arrows = []
         if best_move:
-            arrows = [(best_move.from_square, best_move.to_square)]
+            try:
+                arrows = [(chess.Move.from_uci(best_move).from_square,
+                           chess.Move.from_uci(best_move).to_square)]
+            except:
+                arrows = []
 
         svg = chess.svg.board(board=board, size=650, arrows=arrows)
         st.components.v1.html(svg, height=680)
@@ -245,6 +233,7 @@ if review:
 
         if idx < len(review):
             move = review[idx]
+
             st.markdown(f"### {move['tag']}")
             st.markdown(f"Move: **{move['san']}**")
             st.markdown(f"CPL: **{int(move['cpl'])}**")
@@ -262,7 +251,7 @@ if review:
         if idx == 0:
             score = 0
         else:
-            score, _, _ = analyze_position(engine, review[idx - 1]["fen"])
+            score, _, _ = analyze_position(review[idx - 1]["fen"])
 
         score = max(-1000, min(1000, score))
         st.progress((score + 1000) / 2000)

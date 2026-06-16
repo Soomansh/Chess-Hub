@@ -16,8 +16,7 @@ import urllib.request
 STOCKFISH_DIR = "engine/stockfish"
 STOCKFISH_PATH = os.path.join(STOCKFISH_DIR, "stockfish")
 
-STOCKFISH_URL = "https://github.com/official-stockfish/Stockfish/releases/download/sf_16/stockfish-ubuntu-x86-64-avx2"
-
+STOCKFISH_URL = "https://github.com/official-stockfish/Stockfish/releases/latest/download/stockfish-ubuntu-x86-64-avx2"
 
 def ensure_stockfish():
     os.makedirs(STOCKFISH_DIR, exist_ok=True)

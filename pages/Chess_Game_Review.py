@@ -2,57 +2,65 @@
 
 import os
 import streamlit as st
+import chess
+import chess.pgn
 import chess.engine
-import urllib.request
-import zipfile
+import chess.svg
+from io import StringIO
 
-STOCKFISH_DIR = "engine/stockfish"
-STOCKFISH_BIN = os.path.join(STOCKFISH_DIR, "stockfish")
+# =========================
+# STOCKFISH (SAFE VERSION)
+# =========================
 
-STOCKFISH_URL = "https://stockfishchess.org/files/stockfish_16_linux_x64_avx2.zip"
-
-
-def download_stockfish():
-    os.makedirs(STOCKFISH_DIR, exist_ok=True)
-
-    zip_path = os.path.join(STOCKFISH_DIR, "stockfish.zip")
-
-    if not os.path.exists(STOCKFISH_BIN):
-        try:
-            urllib.request.urlretrieve(STOCKFISH_URL, zip_path)
-
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                zip_ref.extractall(STOCKFISH_DIR)
-
-            # find extracted binary
-            for root, dirs, files in os.walk(STOCKFISH_DIR):
-                for file in files:
-                    if "stockfish" in file and not file.endswith(".zip"):
-                        extracted = os.path.join(root, file)
-                        os.rename(extracted, STOCKFISH_BIN)
-
-            os.chmod(STOCKFISH_BIN, 0o755)
-
-        except Exception as e:
-            st.error(f"Stockfish download failed: {e}")
-            st.stop()
-
-    return STOCKFISH_BIN
-
-
-STOCKFISH_PATH = download_stockfish()
+STOCKFISH_PATH = "stockfish"  # must exist in system or repo
 
 
 @st.cache_resource
 def load_engine():
-    return chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
+    try:
+        return chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
+    except:
+        st.error("Stockfish not found. Add binary to project or install it.")
+        st.stop()
 
 
 engine = load_engine()
 
-# ====================================================================
+# =========================
+# ANALYSIS FUNCTION (MISSING BEFORE)
+# =========================
+
+def analyze_position(engine, fen, depth=12):
+    board = chess.Board(fen)
+
+    try:
+        info = engine.analyse(board, chess.engine.Limit(depth=depth))
+    except:
+        return 0, [], None
+
+    score = info["score"].relative.score(mate_score=10000)
+    if score is None:
+        score = 0
+
+    pv = []
+    best_move = None
+
+    if "pv" in info and info["pv"]:
+        temp = board.copy()
+        for mv in info["pv"][:5]:
+            try:
+                pv.append(temp.san(mv))
+                temp.push(mv)
+            except:
+                break
+        best_move = info["pv"][0]
+
+    return score, pv, best_move
+
+
+# =========================
 # CLASSIFICATION
-# ====================================================================
+# =========================
 
 def classify(cpl):
     if cpl <= 5:
@@ -82,17 +90,17 @@ def long_explanation(tag):
     }.get(tag, "")
 
 
-# ====================================================================
-# PGN
-# ====================================================================
+# =========================
+# PGN LOADER (FIXED IMPORT ISSUE)
+# =========================
 
 def read_game(text):
     return chess.pgn.read_game(StringIO(text))
 
 
-# ====================================================================
+# =========================
 # REVIEW ENGINE
-# ====================================================================
+# =========================
 
 def build_review(game):
     temp = game.board()
@@ -132,9 +140,9 @@ def build_review(game):
     return review, white_loss, black_loss
 
 
-# ====================================================================
+# =========================
 # ACCURACY
-# ====================================================================
+# =========================
 
 def accuracy(loss, count):
     if count == 0:
@@ -142,9 +150,9 @@ def accuracy(loss, count):
     return max(0, min(100, 100 - (loss / count / 10)))
 
 
-# ====================================================================
+# =========================
 # STREAMLIT STATE
-# ====================================================================
+# =========================
 
 if "review" not in st.session_state:
     st.session_state.review = []
@@ -159,9 +167,9 @@ if "black_acc" not in st.session_state:
     st.session_state.black_acc = 0
 
 
-# ====================================================================
+# =========================
 # UI
-# ====================================================================
+# =========================
 
 st.title("♟️ Chess Review")
 
@@ -169,9 +177,9 @@ uploaded = st.file_uploader("Upload PGN", type=["pgn"])
 pgn_text = st.text_area("Or Paste PGN")
 
 
-# ====================================================================
-# ANALYZE
-# ====================================================================
+# =========================
+# ANALYZE BUTTON
+# =========================
 
 if st.button("Analyze Game"):
 
@@ -198,9 +206,9 @@ if st.button("Analyze Game"):
     st.session_state.black_acc = accuracy(bloss, count)
 
 
-# ====================================================================
+# =========================
 # DISPLAY
-# ====================================================================
+# =========================
 
 review = st.session_state.review
 
@@ -221,7 +229,6 @@ if review:
             arrows = [(best_move.from_square, best_move.to_square)]
 
         svg = chess.svg.board(board=board, size=650, arrows=arrows)
-
         st.components.v1.html(svg, height=680)
 
         col1, col2, col3 = st.columns(3)
@@ -238,7 +245,6 @@ if review:
 
         if idx < len(review):
             move = review[idx]
-
             st.markdown(f"### {move['tag']}")
             st.markdown(f"Move: **{move['san']}**")
             st.markdown(f"CPL: **{int(move['cpl'])}**")

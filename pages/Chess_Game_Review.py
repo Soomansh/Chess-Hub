@@ -8,46 +8,23 @@ import chess.svg
 from io import StringIO
 import os
 import urllib.request
+import shutil
 
 # ====================================================================
 # STOCKFISH SETUP
 # ====================================================================
 
-STOCKFISH_DIR = "engine/stockfish"
-STOCKFISH_PATH = os.path.join(STOCKFISH_DIR, "stockfish")
+def get_stockfish_path():
+    path = shutil.which("stockfish")
 
-# WORKING DIRECT RELEASE (stable asset link)
-STOCKFISH_URL = "https://github.com/official-stockfish/Stockfish/releases/download/sf_16/stockfish-ubuntu-x86-64-avx2"
+    if path is None:
+        st.error("Stockfish is not installed on this server.")
+        st.stop()
 
-
-def ensure_stockfish():
-    os.makedirs(STOCKFISH_DIR, exist_ok=True)
-
-    if not os.path.exists(STOCKFISH_PATH):
-        try:
-            req = urllib.request.Request(
-                STOCKFISH_URL,
-                headers={"User-Agent": "Mozilla/5.0"}
-            )
-
-            with urllib.request.urlopen(req, timeout=30) as response:
-                data = response.read()
-
-            with open(STOCKFISH_PATH, "wb") as f:
-                f.write(data)
-
-            os.chmod(STOCKFISH_PATH, 0o755)
-
-        except Exception as e:
-            st.error("Stockfish download failed. Using fallback error-safe mode.")
-            st.error(str(e))
-            st.stop()
-
-    return STOCKFISH_PATH
+    return path
 
 
-# initialize engine ONCE
-STOCKFISH_PATH = ensure_stockfish()
+STOCKFISH_PATH = get_stockfish_path()
 
 
 @st.cache_resource

@@ -1,23 +1,4 @@
-
 # AI ASSISTANCE WAS USED IN WRITING THIS CODE-------------------------------------------------------------------------
-
-"""
-Chess Review
-
-Features:
-- PGN Paste
-- PGN Upload
-- Stockfish Analysis
-- Eval Bar
-- Move Navigation
-- Accuracy Estimates
-- Move Classification
-- Best Move Suggestions
-- Principal Variation Display
-- Timeline
-- Chessboard Rendering
-- Custom Styling
-"""
 
 import streamlit as st
 import chess
@@ -26,7 +7,6 @@ import chess.engine
 import chess.svg
 from io import StringIO
 import os
-import stat
 import urllib.request
 
 # ====================================================================
@@ -36,175 +16,137 @@ import urllib.request
 STOCKFISH_DIR = "engine/stockfish"
 STOCKFISH_PATH = os.path.join(STOCKFISH_DIR, "stockfish")
 
-# more stable direct release 
 STOCKFISH_URL = "https://github.com/official-stockfish/Stockfish/releases/download/sf_16/stockfish-ubuntu-x86-64-avx2"
+
 
 def ensure_stockfish():
     os.makedirs(STOCKFISH_DIR, exist_ok=True)
 
     if not os.path.exists(STOCKFISH_PATH):
-        print("Downloading Stockfish...")
-
         try:
             req = urllib.request.Request(
                 STOCKFISH_URL,
                 headers={"User-Agent": "Mozilla/5.0"}
             )
 
-            with urllib.request.urlopen(req) as response, open(STOCKFISH_PATH, "wb") as out_file:
-                out_file.write(response.read())
+            with urllib.request.urlopen(req) as response, open(STOCKFISH_PATH, "wb") as f:
+                f.write(response.read())
 
             os.chmod(STOCKFISH_PATH, 0o755)
 
-            print("Stockfish downloaded successfully!")
-
         except Exception as e:
-            raise RuntimeError(f"Stockfish download failed: {e}")
+            st.error(f"Stockfish download failed: {e}")
+            st.stop()
 
     return STOCKFISH_PATH
 
-# =================================================================================================
-# ANALYSIS DATA
-# ============================================================================================================
 
-@st.cache_data(show_spinner=False)
-def analyze_position(fen, depth=12):
+# initialize engine ONCE
+STOCKFISH_PATH = ensure_stockfish()
 
+
+@st.cache_resource
+def load_engine():
+    return chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
+
+
+engine = load_engine()
+
+# ====================================================================
+# ANALYSIS
+# ====================================================================
+
+def analyze_position(engine, fen, depth=12):
     board = chess.Board(fen)
 
-    info = engine.analyse(
-        board,
-        chess.engine.Limit(depth=depth)
-    )
+    try:
+        info = engine.analyse(board, chess.engine.Limit(depth=depth))
+    except:
+        return 0, [], None
 
-    score = info["score"].relative.score(
-        mate_score=10000
-    )
-
+    score = info["score"].relative.score(mate_score=10000)
     if score is None:
         score = 0
 
     pv = []
+    best_move = None
 
-    if "pv" in info:
+    if "pv" in info and info["pv"]:
         temp = board.copy()
-
         for mv in info["pv"][:5]:
             try:
                 pv.append(temp.san(mv))
                 temp.push(mv)
             except:
                 break
-
-    best_move = None
-
-    if "pv" in info and len(info["pv"]) > 0:
         best_move = info["pv"][0]
 
     return score, pv, best_move
 
-# ================================================================================================
+
+# ====================================================================
 # CLASSIFICATION
-# ======================================================================================================
+# ====================================================================
 
 def classify(cpl):
-
     if cpl <= 5:
-        return "🟢 BEST", "Perfect engine move."
-
+        return "🟢 BEST", "Perfect move."
     if cpl <= 20:
-        return "💎 !! EXCELLENT !!", "Nearly perfect continuation."
-
+        return "💎 EXCELLENT", "Near perfect."
     if cpl <= 50:
-        return "🔵 ! GREAT !", "Strong move improving the position."
-
+        return "🔵 GREAT", "Strong move."
     if cpl <= 100:
         return "⚪ GOOD", "Solid move."
-
     if cpl <= 200:
-        return "🟡 ?! INACCURACY ?!", "Small evaluation loss."
-
+        return "🟡 INACCURACY", "Small mistake."
     if cpl <= 400:
-        return "🟠 ? MISTAKE ?", "Noticeable strategic loss."
+        return "🟠 MISTAKE", "Significant loss."
+    return "🔴 BLUNDER", "Major error."
 
-    return "🔴 ?? BLUNDER ??", "Major loss of evaluation."
-
-# =====================================================================================================
-# EXPLANATIONS
-# ====================================================================================================
 
 def long_explanation(tag):
+    return {
+        "🟢 BEST": "Perfect engine choice.",
+        "💎 EXCELLENT": "Very accurate move.",
+        "🔵 GREAT": "Strong continuation.",
+        "⚪ GOOD": "Playable move.",
+        "🟡 INACCURACY": "Slight inaccuracy.",
+        "🟠 MISTAKE": "Clear mistake.",
+        "🔴 BLUNDER": "Severe blunder."
+    }.get(tag, "")
 
-    explanations = {
-        "🟢 BEST":
-        "BEST! This matches Stockfish's preferred move and keeps maximum pressure.",
 
-        "💎 !! EXCELLENT !!":
-        "EXCELLENT! Very close to the engine's first choice.",
-
-        "🔵 ! GREAT !":
-        "GREAT! Strong practical move that maintains an advantage.",
-
-        "⚪ GOOD":
-        "GOOD! Playable and reasonable.",
-
-        "🟡 ?! INACCURACY ?!":
-        "INACCURACY. A stronger continuation was available.",
-
-        "🟠 ? MISTAKE ?":
-        "MISTAKE. This move significantly worsened the position.",
-
-        "🔴 ?? BLUNDER ??":
-        "BLUNDER! A major tactical or positional opportunity was missed."
-    }
-
-    return explanations.get(tag, "")
- 
-
-# ===================================================================================================
-# LOAD GAME
-# ==================================================================================================
+# ====================================================================
+# PGN
+# ====================================================================
 
 def read_game(text):
+    return chess.pgn.read_game(StringIO(text))
 
-    game = chess.pgn.read_game(
-        StringIO(text)
-    )
 
-    return game
-
-# ==================================================================================================
-# REVIEW GENERATION
-# =======================================================================================
+# ====================================================================
+# REVIEW ENGINE
+# ====================================================================
 
 def build_review(game):
-
     temp = game.board()
-
     review = []
 
     white_loss = 0
     black_loss = 0
 
-    for move_index, move in enumerate(
-        game.mainline_moves()
-    ):
+    for i, move in enumerate(game.mainline_moves()):
 
-        before_score, pv, best_move = analyze_position(
-            temp.fen()
-        )
+        before_score, pv, best_move = analyze_position(engine, temp.fen())
 
         san = temp.san(move)
-
         temp.push(move)
 
-        after_score, _, _ = analyze_position(
-            temp.fen()
-        )
+        after_score, _, _ = analyze_position(engine, temp.fen())
 
         cpl = abs(after_score - before_score)
 
-        tag, short_reason = classify(cpl)
+        tag, reason = classify(cpl)
 
         if temp.turn == chess.BLACK:
             white_loss += cpl
@@ -212,11 +154,10 @@ def build_review(game):
             black_loss += cpl
 
         review.append({
-            "move_number": move_index + 1,
             "san": san,
             "tag": tag,
             "cpl": cpl,
-            "reason": short_reason,
+            "reason": reason,
             "long_reason": long_explanation(tag),
             "fen": temp.fen(),
             "pv": pv
@@ -224,22 +165,20 @@ def build_review(game):
 
     return review, white_loss, black_loss
 
-# =====================================================================================================================
+
+# ====================================================================
 # ACCURACY
-# ===============================================================================================================
+# ====================================================================
 
 def accuracy(loss, count):
-
     if count == 0:
         return 100
+    return max(0, min(100, 100 - (loss / count / 10)))
 
-    value = 100 - (loss / count / 10)
 
-    return max(0, min(100, value))
-
-# ===========================================================================================================
-# STATE
-# =======================================================================================================
+# ====================================================================
+# STREAMLIT STATE
+# ====================================================================
 
 if "review" not in st.session_state:
     st.session_state.review = []
@@ -247,35 +186,38 @@ if "review" not in st.session_state:
 if "index" not in st.session_state:
     st.session_state.index = 0
 
-# =========================================================================================================
-# HEADER
-# =========================================================================================================
+if "white_acc" not in st.session_state:
+    st.session_state.white_acc = 0
+
+if "black_acc" not in st.session_state:
+    st.session_state.black_acc = 0
+
+
+# ====================================================================
+# UI
+# ====================================================================
 
 st.title("♟️ Chess Review")
 
-uploaded = st.file_uploader(
-    "Upload PGN",
-    type=["pgn"]
-)
+uploaded = st.file_uploader("Upload PGN", type=["pgn"])
+pgn_text = st.text_area("Or Paste PGN")
 
-pgn_text = st.text_area(
-    "Or Paste PGN"
-)
 
-# ====================================================================================================
-# LOAD
-# =============================================================================================================
+# ====================================================================
+# ANALYZE
+# ====================================================================
 
 if st.button("Analyze Game"):
 
-    text = pgn_text
+    if not pgn_text.strip() and not uploaded:
+        st.error("Please upload or paste a PGN.")
+        st.stop()
 
-    if uploaded:
-        text = uploaded.read().decode()
+    text = uploaded.read().decode() if uploaded else pgn_text
 
     game = read_game(text)
 
-    if game is None:
+    if not game:
         st.error("Invalid PGN")
         st.stop()
 
@@ -284,21 +226,15 @@ if st.button("Analyze Game"):
     st.session_state.review = review
     st.session_state.index = 0
 
-    count = max(1, len(review)//2)
+    count = max(1, len(review) // 2)
 
-    st.session_state.white_acc = accuracy(
-        wloss,
-        count
-    )
+    st.session_state.white_acc = accuracy(wloss, count)
+    st.session_state.black_acc = accuracy(bloss, count)
 
-    st.session_state.black_acc = accuracy(
-        bloss,
-        count
-    )
 
-# ==============================================================================================================
-# MAIN UI :D
-# ======================================================================================================
+# ====================================================================
+# DISPLAY
+# ====================================================================
 
 review = st.session_state.review
 
@@ -306,149 +242,63 @@ if review:
 
     idx = st.session_state.index
 
-    left, right = st.columns([2,1])
+    left, right = st.columns([2, 1])
 
     with left:
 
-        if idx == 0:
-            board = chess.Board()
-        else:
-            board = chess.Board(
-                review[idx-1]["fen"]
-            )
+        board = chess.Board() if idx == 0 else chess.Board(review[idx - 1]["fen"])
+
+        _, _, best_move = analyze_position(engine, board.fen())
 
         arrows = []
+        if best_move:
+            arrows = [(best_move.from_square, best_move.to_square)]
 
-        try:
-            _, _, best_move = analyze_position(
-                board.fen()
-            )
+        svg = chess.svg.board(board=board, size=650, arrows=arrows)
 
-            if best_move:
-                arrows = [
-                    (
-                        best_move.from_square,
-                        best_move.to_square
-                    )
-                ]
-        except:
-            pass
+        st.components.v1.html(svg, height=680)
 
-        svg = chess.svg.board(
-            board=board,
-            size=650,
-            arrows=arrows
-        )
-
-        st.components.v1.html(
-            svg,
-            height=680
-        )
-
-        col1,col2,col3 = st.columns([1,1,1])
+        col1, col2, col3 = st.columns(3)
 
         with col1:
             if st.button("⬅ Previous"):
-                st.session_state.index = max(
-                    0,
-                    idx - 1
-                )
+                st.session_state.index = max(0, idx - 1)
                 st.rerun()
 
         with col3:
             if st.button("Next ➡"):
-                st.session_state.index = min(
-                    len(review)-1,
-                    idx + 1
-                )
+                st.session_state.index = min(len(review) - 1, idx + 1)
                 st.rerun()
 
         if idx < len(review):
-
             move = review[idx]
 
-            st.markdown(
-                f"<div class='big-tag'>{move['tag']}!!!</div>",
-                unsafe_allow_html=True
-            )
-
-            st.markdown(
-                f"### Move Played: {move['san']}"
-            )
-
-            st.markdown(
-                f"**Centipawn Loss:** {int(move['cpl'])}"
-            )
-
-            st.markdown(
-                f"<div class='explain'>{move['long_reason']}</div>",
-                unsafe_allow_html=True
-            )
-
-            st.markdown("### Best Line")
-
-            st.write(
-                " → ".join(move["pv"])
-            )
+            st.markdown(f"### {move['tag']}")
+            st.markdown(f"Move: **{move['san']}**")
+            st.markdown(f"CPL: **{int(move['cpl'])}**")
+            st.markdown(move["long_reason"])
+            st.write(" → ".join(move["pv"]))
 
     with right:
 
         st.subheader("Accuracy")
-
-        st.metric(
-            "White",
-            f"{st.session_state.white_acc:.1f}%"
-        )
-
-        st.metric(
-            "Black",
-            f"{st.session_state.black_acc:.1f}%"
-        )
+        st.metric("White", f"{st.session_state.white_acc:.1f}%")
+        st.metric("Black", f"{st.session_state.black_acc:.1f}%")
 
         st.subheader("Evaluation")
 
         if idx == 0:
             score = 0
         else:
-            score, _, _ = analyze_position(
-                review[idx-1]["fen"]
-            )
+            score, _, _ = analyze_position(engine, review[idx - 1]["fen"])
 
-        score = max(
-            -1000,
-            min(1000, score)
-        )
+        score = max(-1000, min(1000, score))
+        st.progress((score + 1000) / 2000)
 
-        percent = (score + 1000)/2000
+        st.subheader("Timeline")
 
-        st.progress(percent)
+        for i, m in enumerate(review):
+            mark = "➡" if i == idx else ""
+            st.write(f"{mark} {i+1}. {m['tag']} {m['san']}")
 
-        st.subheader("Move Timeline")
-
-        for i, move in enumerate(review):
-
-            marker = "----->" if i == idx else ""
-
-            st.write(
-                f"{marker} {i+1}. {move['tag']} {move['san']}"
-            )
-
-        st.markdown("---")
-
-        if idx < len(review):
-
-            move = review[idx]
-
-            st.subheader("Move Insight")
-
-            st.write(move["reason"])
-
-            st.write(
-                f"This move produced roughly "
-                f"{int(move['cpl'])} centipawns "
-                f"of evaluation swing."
-            )
-
-st.caption(
-    "Hope you Enjoy :D"
-)
+st.caption("Hope you Enjoy :D")

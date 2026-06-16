@@ -1,30 +1,46 @@
 # AI ASSISTANCE WAS USED IN WRITING THIS CODE-------------------------------------------------------------------------
 
-import streamlit as st
-import chess
-import chess.pgn
-import chess.engine
-import chess.svg
-from io import StringIO
 import os
+import streamlit as st
+import chess.engine
 import urllib.request
-import shutil
+import zipfile
 
-# ====================================================================
-# STOCKFISH SETUP
-# ====================================================================
+STOCKFISH_DIR = "engine/stockfish"
+STOCKFISH_BIN = os.path.join(STOCKFISH_DIR, "stockfish")
 
-def get_stockfish_path():
-    path = shutil.which("stockfish")
-
-    if path is None:
-        st.error("Stockfish is not installed on this server.")
-        st.stop()
-
-    return path
+STOCKFISH_URL = "https://stockfishchess.org/files/stockfish_16_linux_x64_avx2.zip"
 
 
-STOCKFISH_PATH = get_stockfish_path()
+def download_stockfish():
+    os.makedirs(STOCKFISH_DIR, exist_ok=True)
+
+    zip_path = os.path.join(STOCKFISH_DIR, "stockfish.zip")
+
+    if not os.path.exists(STOCKFISH_BIN):
+        try:
+            urllib.request.urlretrieve(STOCKFISH_URL, zip_path)
+
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(STOCKFISH_DIR)
+
+            # find extracted binary
+            for root, dirs, files in os.walk(STOCKFISH_DIR):
+                for file in files:
+                    if "stockfish" in file and not file.endswith(".zip"):
+                        extracted = os.path.join(root, file)
+                        os.rename(extracted, STOCKFISH_BIN)
+
+            os.chmod(STOCKFISH_BIN, 0o755)
+
+        except Exception as e:
+            st.error(f"Stockfish download failed: {e}")
+            st.stop()
+
+    return STOCKFISH_BIN
+
+
+STOCKFISH_PATH = download_stockfish()
 
 
 @st.cache_resource
@@ -33,38 +49,6 @@ def load_engine():
 
 
 engine = load_engine()
-
-# ====================================================================
-# ANALYSIS
-# ====================================================================
-
-def analyze_position(engine, fen, depth=12):
-    board = chess.Board(fen)
-
-    try:
-        info = engine.analyse(board, chess.engine.Limit(depth=depth))
-    except:
-        return 0, [], None
-
-    score = info["score"].relative.score(mate_score=10000)
-    if score is None:
-        score = 0
-
-    pv = []
-    best_move = None
-
-    if "pv" in info and info["pv"]:
-        temp = board.copy()
-        for mv in info["pv"][:5]:
-            try:
-                pv.append(temp.san(mv))
-                temp.push(mv)
-            except:
-                break
-        best_move = info["pv"][0]
-
-    return score, pv, best_move
-
 
 # ====================================================================
 # CLASSIFICATION

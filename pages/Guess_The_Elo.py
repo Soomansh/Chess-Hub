@@ -51,7 +51,7 @@ def get_random_game(sample_size=8000):
                     best_score = score
 
                     chosen = {
-                        "moves": moves,f
+                        "moves": moves,
                         "white_elo": white_elo,
                         "black_elo": black_elo,
                         "avg_elo": avg_elo,

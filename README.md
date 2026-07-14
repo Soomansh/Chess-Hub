@@ -205,11 +205,16 @@ ChessHub is designed to teach:
 
 ---
 
+## 📄 License
+
+This project is licensed under the MIT License. See the `LICENSE` file for more information.
+
+---
+
 # 📦 Installation
 
 Clone the repository:
 
 ```bash
 git clone https://github.com/Soomansh/Chess-Hub.git
-
 

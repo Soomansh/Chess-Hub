@@ -3,3 +3,9 @@ pandas
 numpy
 python-chess
 stockfish
+Pillow
+streamlit-option-menu
+plotly
+opencv-python
+mediapipe
+pyserial

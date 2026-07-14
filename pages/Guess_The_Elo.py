@@ -51,7 +51,7 @@ def get_random_game(sample_size=8000):
                     best_score = score
 
                     chosen = {
-                        "moves": moves,
+                        "moves": moves,f
                         "white_elo": white_elo,
                         "black_elo": black_elo,
                         "avg_elo": avg_elo,
@@ -142,7 +142,7 @@ for move in moves[:st.session_state.move_index]:
 left, right = st.columns([2, 1])
 
 with left:
-    st.title("♟ Guess The Elo (Streamed Version)")
+    st.title("♟ Guess The Elo")
 
     svg = chess.svg.board(board=board, size=650)
     st.components.v1.html(svg, height=700)

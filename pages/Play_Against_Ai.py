@@ -2,7 +2,7 @@ import streamlit as st
 import chess
 import chess.svg
 import chess.engine
-import urllib.request
+import urllib.request 
 import zipfile
 import os
 import glob

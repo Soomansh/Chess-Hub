@@ -8,21 +8,31 @@
 
 ## Overview 
 
-ChessHub is an interactive chess learning platform built with Python and Streamlit but is run on render :D
+ChessHub is a chess learning platform built with Python and Streamlit. It is deployed using Render so users can access the application online without installing anything :D
 
-The goal of ChessHub is to help players improve at every stage of the game by combining opening education, tactical training, endgame practice, game analysis, and Guess The Elo into one platform.
+I created ChessHub to combine multiple aspects of chess into one single website. The project includes tools for learning openings, reviewing games, practicing endgames, and testing chess knowledge and lastly, MAKE CHESS FUN!
 
-Instead of only showing moves, ChessHub focuses on helping players understand the ideas behind chess: why moves work, how positions develop, and how to improve decision making.
+I wanted ChessHub to be more than just a move viewer. My goal was to help players understand why moves are played and how positions develop.
 
 AI assistance was used during development for debugging, troubleshooting, and improving parts of the code.
 
 ---
 
-# DEMO :) 
+# DEMO 
 
 PS: Guess the Elo will take some time to load as it fetches real random games that are often lengthy
 
 https://chess-hub-2o9y.onrender.com/
+
+---
+
+# My Journey Building ChessHub
+
+I started ChessHub as a way to make learning chess more interactive and bring everyone together. The project began as an opening recommendation tool, but it grew into a complete chess learning platform.
+
+Throughout development, I worked on chess visualization, PGN processing, game analysis, and databases. Some of the hardest parts were handling chess positions correctl and integrating analysis tools. After having everything working together, making everything work individually, making it all work together was a rollercoaster of errors and problems. 
+
+The biggest lesson I learned was that building a chess application is not just about moving pieces on a board. It requires understanding chess logic, user experience, and how to turn data into something useful for players. This project really represents me as a person and I hope you truly enjoy this! 
 
 # Features 
 
@@ -40,8 +50,6 @@ https://chess-hub-2o9y.onrender.com/
   - Strategic plans and tactics that often appear.
   - Strengths and weaknesses of the opening.
   - Typical middlegame transitions and what to expect/ look for. 
-
-<img width="1397" height="888" alt="image" src="https://github.com/user-attachments/assets/e0966681-9b31-40b1-8f61-a6c71f170a66" />
 
 ---
 
@@ -86,7 +94,7 @@ Features:
 
 ---
 
-## 🔎 Board Visualizer 🔍
+## Board Visualizer 
 
 Explore chess positions with an interactive board and teach opening moves.
 
@@ -104,7 +112,7 @@ Features:
 
 ##  Endgame Puzzles 
 
-Practice important endgame positions and be able to destroy your opponents in endgames quickly.
+Practice important endgame positions and be able to covert against your opponents easily. 
 
 Features:
 - Solve realistic endgame scenarios coming from real games.
@@ -113,8 +121,6 @@ Features:
 - Practice common patterns so time doesnt bother you in a real game. 
 - Increase your puzzle streak and accuracy.
 - Learn tactics and employ them into your game.
-
-<img width="1711" height="874" alt="image" src="https://github.com/user-attachments/assets/1eae4f4d-d332-432f-9a5c-123e0b1d8799" />
 
 
 ---
@@ -146,8 +152,6 @@ Features:
 - Gain deep knowledge about the opening and the moves you should be making.
 - Tactics and how to combat them when faced.
 
-<img width="1584" height="839" alt="image" src="https://github.com/user-attachments/assets/9335b8c3-2f79-4876-ae85-f813267797e8" />
-
 
 ---
 
@@ -167,7 +171,7 @@ Features:
 
 ---
 
-##  Interactive Chess Experience 👀
+##  Interactive Chess Experience 
 
 - Real time chessboard updates and moves.
 - Forward and backward move navigation that makes learning and overall user experience flawless.
@@ -195,7 +199,7 @@ ChessHub is designed to help and teach:
 
 ---
 
-# ChessHub is Built With 🔧
+# ChessHub is Built With 
 
 - Python
 - Streamlit
@@ -207,13 +211,15 @@ ChessHub is designed to help and teach:
 
 ---
 
+#
+
 ## LICENSE
 
 This project is licensed under the MIT License. See the `LICENSE` file for more information.
 
 ---
 
-# Installation of ChessHub 😄
+# Installation of ChessHub 
 
 Clone the repository:
 

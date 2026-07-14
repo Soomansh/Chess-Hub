@@ -135,4 +135,9 @@ Future Improvements to Look Out For:
         -Engine evaluation bar with the assistance of Stockfish
 
         -Animated moves
+---------------------------------------------------------------------------------------------------------------------------------------------
+📌 Note on Commit Count
+The number of commits in this repository does not reflect the true amount of actual changes. Several commits were made to correct earlier mistakes — such as adding missing descriptions, fixing small errors, and adjusting formatting.
 
+Because of this, the commit history includes extra revisions that were part of cleanup rather than new feature additions. Thanks for understanding!
+--------------------------------------------------------------------------------------------------------------------------------------

@@ -5,7 +5,7 @@ st.set_page_config(
     page_icon="♟️",
     layout="wide"
 )
-
+ 
 # -------------------------------------------------------- HEADER -------------------------------------------------------------
 st.title("♟️ Chess Hub")
 st.subheader("Learn • Train • Analyze • Improve")

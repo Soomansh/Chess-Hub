@@ -23,7 +23,11 @@ Current Features:
 
         -Educational insights: plans, ideas, strengths, and weaknesses
 
-        -Real-time board updates using python-chess
+        -Real-time board updates 
+
+        -Chess Review features that breaks down your games 
+
+        -Guess the Elo: A adapted version inspired by GTE from GothamChess
 
         -Clean Streamlit UI for simple and fast interaction
 
@@ -39,6 +43,8 @@ This app is designed to help players understand:
         -Transition from opening and into a strong early middlegame
 
         -Positional ideas like center control, development, and king safety
+
+        -How to win in a Endgame
 
 
 This project was built with:
@@ -127,10 +133,6 @@ Future Improvements to Look Out For:
         -Chess.com style move arrows and analysis lines
 
         -Engine evaluation bar with the assistance of Stockfish
-
-        -Opening quiz mode
-
-        -Suggested best moves based on position
 
         -Animated moves
 

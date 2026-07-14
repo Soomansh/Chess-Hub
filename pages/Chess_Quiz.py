@@ -3,9 +3,9 @@ import streamlit as st
 st.title("♟️ Chess Opening Decider")
 st.write("Answer a few questions and get your best chess openings.")
 
-# =========================================================
+# ============================================================================
 # QUIZ
-# =========================================================
+# ====================================================================================
 
 skill = st.selectbox("Skill level", ["Beginner", "Intermediate", "Advanced"])
 style = st.selectbox("Play style", ["Defensive", "Positional", "Aggressive"])
@@ -16,9 +16,9 @@ time_control = st.selectbox("Time control", ["Bullet", "Blitz", "Rapid", "Classi
 risk = st.selectbox("Risk preference", ["Low", "Medium", "High"])
 goal = st.selectbox("Main goal", ["Tactics", "Strategy", "Endgames", "Opening knowledge"])
 
-# =========================================================
-# AI SCORING SYSTEM (SIMPLE BUT REAL LOGIC)
-# =========================================================
+# ========================================================================
+# AI SCORING SYSTEM (RLLY SIMPLE BUT REAL LOGIC)
+# ==============================================================================
 
 openings_score = {
     "Italian Game": 0,
@@ -68,16 +68,16 @@ if color == "White":
 else:
     openings_score["Sicilian Defense"] += 2
 
-# =========================================================
+# =======================================================================================
 # GET TOP RESULTS
-# =========================================================
+# =====================================================================================
 
 sorted_openings = sorted(openings_score.items(), key=lambda x: x[1], reverse=True)
 top_openings = [x[0] for x in sorted_openings[:3]]
 
-# =========================================================
-# OUTPUT (SHORT ONLY — NO EXPLANATIONS HERE)
-# =========================================================
+# =================================================================================
+# OUTPUT 
+# =================================================================================
 
 if st.button("Get Recommendation"):
 
@@ -88,8 +88,8 @@ if st.button("Get Recommendation"):
 
     st.info("Go to 'Opening Explorer' in the sidebar for full learning breakdown of each opening.")
 
-# =========================================================
+# ==============================================================================
 # OPTIONAL META INFO
-# =========================================================
+# ======================================================================================
 
 st.caption(f"Profile: {style} | Aggression {aggressiveness}/10 | Goal: {goal}")

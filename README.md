@@ -6,7 +6,7 @@
 ![Status](https://img.shields.io/badge/Status-Active-success.svg)
 ![Type](https://img.shields.io/badge/Project-Chess%20Learning%20Platform-black.svg)
 
-## ♟️ Overview ♟️ 
+## Overview 
 
 ChessHub is an interactive chess learning platform built with Python and Streamlit but is run on render :D
 
@@ -24,9 +24,9 @@ PS: Guess the Elo will take some time to load as it fetches real random games th
 
 https://chess-hub-2o9y.onrender.com/
 
-# Features 👍
+# Features 
 
-## ♟️ Opening Recommendation System
+## Opening Recommendation System
 
 - Personalized opening suggestions based on:
   - Playing style like if your defensive or really offensive.
@@ -45,7 +45,7 @@ https://chess-hub-2o9y.onrender.com/
 
 ---
 
-## Chess Review 🤔
+## Chess Review 
 
 Analyze completed chess games through PGN files. This allows the user to input any game and get Chess.com style explanations and descriptions.
 
@@ -102,7 +102,7 @@ Features:
 
 ---
 
-##  Endgame Puzzles 🧐
+##  Endgame Puzzles 
 
 Practice important endgame positions and be able to destroy your opponents in endgames quickly.
 
@@ -119,7 +119,7 @@ Features:
 
 ---
 
-##  Learn Endgames 📖
+##  Learn Endgames 
 
 Learn essential endgame concepts and how to utilize them in a real game. 
 
@@ -151,7 +151,7 @@ Features:
 
 ---
 
-##  Play Against AI 🤖
+##  Play Against AI 
 
 Practice chess against an artificial opponent. 
 
@@ -178,7 +178,7 @@ Features:
 
 ---
 
-#  What ChessHub Helps Players Learn 🧠
+#  What ChessHub Helps Players Learn 
 
 ChessHub is designed to help and teach:
 

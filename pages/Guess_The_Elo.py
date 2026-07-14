@@ -3,7 +3,7 @@ import chess
 import chess.pgn
 import chess.svg
 import random
-
+ 
 st.set_page_config(page_title="Guess The Elo", layout="wide")
 
 # =======================================================================================

@@ -1,143 +1,120 @@
-♟️ ChessHub
+# ♟️ ChessHub
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/Streamlit-App-red.svg)
-![python-chess](https://img.shields.io/badge/python--chess-Engine-lightgrey.svg)
+![python-chess](https://img.shields.io/badge/python--chess-Chess%20Library-lightgrey.svg)
 ![Status](https://img.shields.io/badge/Status-Active-success.svg)
-![Type](https://img.shields.io/badge/Project-Chess%20Trainer-black.svg)
-![Level](https://img.shields.io/badge/Level-Beginner%20Friendly-brightgreen.svg)
+![Type](https://img.shields.io/badge/Project-Chess%20Learning%20Platform-black.svg)
 
-A Streamlit based interactive chess application that helps players explore, understand, and choose chess openings based on their playing style, skill level, and strategic preferences.
+## 🚀 Overview
 
-This project goes beyond simple recommendations by visually demonstrating openings and allowing users to step through moves to better understand how positions develop into the middlegame.
+ChessHub is an interactive chess learning platform built with Python and Streamlit. The goal of ChessHub is to help players improve their understanding of chess by combining opening education, game analysis, and interactive learning tools into one application.
 
-Current Features:
+Instead of only showing moves, ChessHub focuses on explaining **why moves are played**, how positions develop, and how players can improve their decision-making.
 
-        -Opening recommendations based on player style and skill level
+AI assistance was used during development for debugging, troubleshooting, and improving parts of the code.
 
-        -Interactive chessboard with move-by-move visualization
+---
 
-        -Step-through navigation (forward and backward through openings)
+# 🚀 Demo
 
-        -Structured opening database with strategic explanations
+https://buttonpyline1597inpagelinkurlpathnamepagedataurlpathname-8ypxv.streamlit.app/
 
-        -Educational insights: plans, ideas, strengths, and weaknesses
+# ✨ Features
 
-        -Real-time board updates 
+## ♟️ Opening Recommendation System
 
-        -Chess Review features that breaks down your games 
+- Personalized opening suggestions based on:
+  - Playing style
+  - Skill level
+  - Strategic preferences
 
-        -Guess the Elo: A adapted version inspired by GTE from GothamChess
+- Interactive chessboard visualization
+- Move-by-move opening exploration
+- Explanations of:
+  - Opening ideas
+  - Strategic plans
+  - Strengths and weaknesses
+  - Typical middlegame transitions
 
-        -Clean Streamlit UI for simple and fast interaction
 
+## 🔍 Chess Review
 
-This app is designed to help players understand:
+Analyze completed chess games through PGN files.
 
-        -How chess openings actually develop
+Features include:
 
-        -Why certain moves are played and teaching users the meaning of each move not just memorization
+- PGN upload and paste support
+- Move-by-move review
+- Position visualization
+- Move classifications:
+  - Best moves
+  - Excellent moves
+  - Good moves
+  - Inaccuracies
+  - Mistakes
+  - Blunders
+- Accuracy estimates
+- Principal variation suggestions
+- Evaluation insights
 
-        -Common strategic plans in different openings
 
-        -Transition from opening and into a strong early middlegame
+## 🎯 Guess The Elo
 
-        -Positional ideas like center control, development, and king safety
+Inspired by the Guess The Elo concept.
 
-        -How to win in a Endgame
+Features:
 
+- Random chess games from a database
+- Interactive move playback
+- Guess the player's rating range
+- Compare your prediction with the actual rating
+- Track accuracy over multiple games
 
-This project was built with:
-        -Python
 
-        -Streamlit
+## 🧩 Interactive Chess Experience
 
-        -python-chess
+- Real-time chessboard updates
+- Forward and backward move navigation
+- SVG board rendering
+- PGN support
+- Clean Streamlit interface
 
-        -Chess SVG rendering
 
+---
 
-How to Run:
+# 🧠 What ChessHub Helps Players Learn
 
-NOTICE: app.py is now renamed to Opening_Quiz.py!!!
+ChessHub is designed to teach:
 
-pip install streamlit python-chess
+- How openings actually develop
+- The purpose behind opening moves
+- Center control
+- Piece development
+- King safety
+- Positional planning
+- Transition from opening to middlegame
+- Endgame concepts
+- How mistakes affect a position
 
-streamlit run app.py
 
-Clone Repo:
+---
 
-        git clone https://github.com/yourusername/chess-trainer.git
+# 🛠️ Built With
 
-        cd chess-trainer
-        
-Additionally install all other dependencies --> pip install streamlit chess
+- Python
+- Streamlit
+- python-chess
+- Chess SVG Rendering
+- Lichess Cloud Analysis API
+- PGN Databases
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-IMPORTANT NOTE ABOUT STOCKFISH: 
-This project provides both functional frontend and backend components. However, a full Chess.com-style Stockfish engine integration is not included by default. Users are free to extend the project by adding their own engine-based analysis or gameplay features.
-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Stockfish Setup and How to Run
+---
 
-Download python from: https://www.python.org/.
+# 📦 Installation
 
-        Open a terminal in your project folder and run:
+Clone the repository:
 
-                pip install streamlit chess flask flask-cors
-
-        If you are only using Streamlit, you can skip Flask packages.
-
-        Download Stockfish from the official website: https://stockfishchess.org/download/
-
-        Extract the files
-        Locate the executable file (for example: stockfish.exe)
-        Move it to a known folder (recommended: inside your project folder)
-
-                Example path:
-
-                C:\Chess\stockfish\stockfish.exe
-                
-
-        Open your Python file and set the correct path:
-
-        STOCKFISH_PATH = "stockfish.exe"
-
-        STOCKFISH_PATH = "C:\\Chess\\stockfish\\stockfish.exe"
-
-
-        In your terminal, run:
-
-                streamlit run app.py
-
-        Then open the local URL shown in the terminal, usually:
-
-                http://localhost:8501
-
-        If your project includes the API backend, run:
-
-                python app.py
-
-        The server will start at:
-
-                http://127.0.0.1:5000
-
-
-
-Main Purpose/Objective:
-
-This project was created for a hackathon to combine chess education with interactive visualization. The goal is to make learning openings more fun/effective by showing how positions evolve rather than just listing moves.
-
-Future Improvements to Look Out For:
-
-        -Chess.com style move arrows and analysis lines
-
-        -Engine evaluation bar with the assistance of Stockfish
-
-        -Animated moves
----------------------------------------------------------------------------------------------------------------------------------------------
-📌 Note on Commit Count
-The number of commits in this repository does not reflect the true amount of actual changes. Several commits were made to correct earlier mistakes — such as adding missing descriptions, fixing small errors, and adjusting formatting.
-
-Because of this, the commit history includes extra revisions that were part of cleanup rather than new feature additions. Thanks for understanding!
---------------------------------------------------------------------------------------------------------------------------------------
+```bash
+git clone https://github.com/Soomansh/Chess-Hub.git

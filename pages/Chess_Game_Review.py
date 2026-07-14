@@ -14,32 +14,38 @@ from io import StringIO
 LICHESS_API = "https://lichess.org/api/cloud-eval"
 
 
+@st.cache_data(show_spinner=False)
 def analyze_position(fen):
-    """
-    Cloud-based chess analysis (NO STOCKFISH NEEDED)
-    """
+
     try:
-        r = requests.get(LICHESS_API, params={"fen": fen}, timeout=5)
+        r = requests.get(
+            "https://lichess.org/api/cloud-eval",
+            params={
+                "fen": fen,
+                "multiPv": 1
+            },
+            timeout=10
+        )
+
         data = r.json()
 
-        cp = 0
-        pv = []
-        best_move = None
+        if "pvs" not in data:
+            return 0, ["No cloud analysis available"], None
 
-        if "pvs" in data and len(data["pvs"]) > 0:
-            line = data["pvs"][0]
+        line = data["pvs"][0]
 
-            cp = line.get("cp", 0)
+        cp = line.get("cp", 0)
 
-            if "moves" in line:
-                moves = line["moves"].split()
-                pv = moves[:5]
-                best_move = moves[0] if moves else None
+        moves = line.get("moves", "").split()
+
+        pv = moves[:5]
+
+        best_move = moves[0] if moves else None
 
         return cp, pv, best_move
 
-    except:
-        return 0, [], None
+    except Exception as e:
+        return 0, [f"API error: {e}"], None
 
 
 # =========================

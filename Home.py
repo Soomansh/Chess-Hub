@@ -6,13 +6,13 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------- HEADER ----------------
+# -------------------------------------------------------- HEADER -------------------------------------------------------------
 st.title("♟️ Chess Hub")
 st.subheader("Learn • Train • Analyze • Improve")
 
 st.markdown("---")
 
-# ---------------- INTRO ----------------
+# -------------------------------------- INTRO ---------------------------------------------
 st.write("""
 Welcome to your chess platform.
 
@@ -25,7 +25,7 @@ Everything is connected here:
 
 st.markdown("---")
 
-# ---------------- NAVIGATION ----------------
+# ------------------------------------------------- NAVIGATION ------------------------------------------------------------
 st.header("Open Tools")
 
 col1, col2 = st.columns(2)
@@ -33,7 +33,7 @@ col1, col2 = st.columns(2)
 with col1:
     st.subheader("Learning")
 
-    if st.button("♟️ Chess Quiz"):
+    if st.button("Chess Quiz"):
         st.switch_page("pages/Chess_Quiz.py")
 
     if st.button("Opening Explorer"):
@@ -62,14 +62,14 @@ with col2:
 
 st.markdown("---")
 
-# ---------------- STATUS ----------------
+# ------------------------------------------------- STATUS -----------------------------------------------------
 st.header("What this platform does")
 
 st.info("""
 1. Opening learning system
 2. Quiz-based training
 3. Board practice tools
-4. AI opponent (Stockfish)
+4. AI opponent 
 5. Full game review system
 6. Endgame puzzles
 7. Endgame tactics learning system

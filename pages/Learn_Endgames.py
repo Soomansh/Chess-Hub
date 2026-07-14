@@ -3,7 +3,7 @@ import chess
 import chess.svg
 
 st.set_page_config(
-    page_title="Learn Endgames",
+    page_title="Learn Endgames", 
     layout="wide"
 )
  

@@ -135,7 +135,7 @@ Topics include:
 
 ---
 
-##  Opening Explorer 📚
+##  Opening Explorer 
 
 Discover and learn chess openings and fully understand them inside out. 
 

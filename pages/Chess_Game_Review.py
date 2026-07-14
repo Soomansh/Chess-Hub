@@ -2,7 +2,7 @@
 
 import streamlit as st
 import chess
-import chess.pgn
+import chess.pgn 
 import chess.svg
 import requests
 from io import StringIO

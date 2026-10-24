@@ -47,3 +47,5 @@ npm run build
 - Play vs AI uses a cached best line where available; when no line is available, it makes a legal fallback move. This is not equivalent to running a full-strength Stockfish engine.
 - Accuracy is an estimate based on available evaluations and is not an official Chess.com/Lichess accuracy metric.
 - This migration preserves the main user-facing tools, but the Streamlit Python source is not executed by Vercel. Review all features and the live deployment before requesting re-certification.
+
+Vercel deployment trigger.

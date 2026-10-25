@@ -14,6 +14,16 @@ This is a Next.js migration of the original Streamlit ChessHub project. It keeps
 - Endgame Puzzle Trainer using the included puzzle dataset
 - Learn Endgames lessons
 
+Some Pictures:
+<img width="1912" height="916" alt="image" src="https://github.com/user-attachments/assets/c5a0fac3-09dd-4190-996a-448d70f7f544" />
+<img width="1900" height="915" alt="image" src="https://github.com/user-attachments/assets/ae6956a8-742e-415b-8578-e46148509a06" />
+<img width="1882" height="921" alt="image" src="https://github.com/user-attachments/assets/71150f7d-a55d-46ed-9f75-ab94a5e165d3" />
+
+
+
+
+
+
 ## Run locally
 
 Install Node.js 20 or newer. From this folder, run:

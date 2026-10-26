@@ -51,17 +51,17 @@ The biggest lesson I learned was that building a chess application is not just a
 ---
 
 ---
-#Guess the Elo pictures:
+Guess the Elo pictures:
 <img width="1900" height="915" alt="image" src="https://github.com/user-attachments/assets/ae6956a8-742e-415b-8578-e46148509a06" />
 ---
 
 ---
-#Board Visualizer pictures:
+Board Visualizer pictures:
 <img width="1882" height="921" alt="image" src="https://github.com/user-attachments/assets/71150f7d-a55d-46ed-9f75-ab94a5e165d3" />
 ---
 
 ---
-#Chess Review picture:
+Chess Review picture:
 <img width="1540" height="810" alt="image" src="https://github.com/user-attachments/assets/00a91104-1c39-4e65-b08d-8059ce2fc6b1" />
 ---
 

@@ -33,7 +33,7 @@ AI assistance was used during development for debugging, troubleshooting, and im
 - Learn Endgames lessons
 
 ---
-#Live Demo
+Live Demo :D
 - https://chess-hub-nextjs-q6q5vp398-soomansh.vercel.app/
 ---
 
